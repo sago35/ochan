@@ -6,7 +6,8 @@
 
 ```go
 func ExampleOchan() {
-	o := NewOchan()
+	result := make(chan string, 100)
+	o := NewOchan(result)
 
 	c1 := o.GetCh()
 	c2 := o.GetCh()
@@ -19,7 +20,7 @@ func ExampleOchan() {
 	close(c1)
 	close(c2)
 
-	for s := range o.Out {
+	for s := range result {
 		fmt.Println(s)
 		// Output:
 		// Hello c1

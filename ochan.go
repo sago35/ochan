@@ -2,13 +2,13 @@ package ochan
 
 type Ochan struct {
 	In   []chan string
-	Out  chan string
+	out  chan string
 	done chan struct{}
 }
 
-func NewOchan() *Ochan {
+func NewOchan(ch chan string) *Ochan {
 	o := &Ochan{
-		Out:  make(chan string, 100),
+		out:  ch,
 		done: make(chan struct{}),
 	}
 
@@ -16,10 +16,10 @@ func NewOchan() *Ochan {
 		for _, ch := range o.In {
 			for s := range ch {
 				//fmt.Println("xxx", s)
-				o.Out <- s
+				o.out <- s
 			}
 		}
-		close(o.Out)
+		close(o.out)
 		close(o.done)
 	}(o)
 

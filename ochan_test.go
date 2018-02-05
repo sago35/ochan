@@ -19,7 +19,8 @@ func TestOchanBasic(t *testing.T) {
 		"c3-2",
 	}
 
-	o := NewOchan()
+	result := make(chan string, 100)
+	o := NewOchan(result)
 	n2 := runtime.NumGoroutine()
 	if n1+1 != n2 {
 		t.Errorf("NumGoroutine")
@@ -48,7 +49,7 @@ func TestOchanBasic(t *testing.T) {
 	}
 
 	i := 0
-	for s := range o.Out {
+	for s := range result {
 		if g, e := s, expected[i]; g != e {
 			t.Errorf("got %q, want %q", g, e)
 		}
@@ -63,7 +64,8 @@ func TestOchanBasic(t *testing.T) {
 }
 
 func ExampleOchan() {
-	o := NewOchan()
+	result := make(chan string, 100)
+	o := NewOchan(result)
 
 	c1 := o.GetCh()
 	c2 := o.GetCh()
@@ -76,7 +78,7 @@ func ExampleOchan() {
 	close(c1)
 	close(c2)
 
-	for s := range o.Out {
+	for s := range result {
 		fmt.Println(s)
 		// Output:
 		// Hello c1
