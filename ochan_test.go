@@ -23,7 +23,7 @@ func TestOchanBasic(t *testing.T) {
 	o := NewOchan(result)
 	n2 := runtime.NumGoroutine()
 	if n1+1 != n2 {
-		t.Errorf("NumGoroutine")
+		t.Errorf("NumGoroutine %d %d", n1, n2)
 	}
 
 	c1 := o.GetCh()
@@ -45,7 +45,7 @@ func TestOchanBasic(t *testing.T) {
 
 	n3 := runtime.NumGoroutine()
 	if n2 != n3 {
-		t.Errorf("NumGoroutine")
+		t.Errorf("NumGoroutine %d %d", n2, n3)
 	}
 
 	o.Wait()
@@ -61,7 +61,7 @@ func TestOchanBasic(t *testing.T) {
 
 	n4 := runtime.NumGoroutine()
 	if n1 != n4 {
-		t.Errorf("NumGoroutine", n1, n4)
+		t.Errorf("NumGoroutine %d %d", n1, n4)
 	}
 }
 
