@@ -1,3 +1,5 @@
+[![GoDoc Reference](https://godoc.org/github.com/sago35/ochan?status.svg)](https://godoc.org/github.com/sago35/ochan)
+
 # Ochan
 
 Package ochan provides ordered chan.
