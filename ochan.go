@@ -1,38 +1,45 @@
 package ochan
 
 type Ochan struct {
-	In   []chan string
 	out  chan string
+	in   chan chan string
 	done chan struct{}
 }
 
-func NewOchan(ch chan string) *Ochan {
+func NewOchan(out chan string) *Ochan {
 	o := &Ochan{
-		out:  ch,
+		out:  out,
+		in:   make(chan chan string, 100),
 		done: make(chan struct{}),
 	}
 
 	go func(o *Ochan) {
-		for _, ch := range o.In {
-			for s := range ch {
-				//fmt.Println("xxx", s)
-				o.out <- s
+		for {
+			select {
+			case ch, ok := <-o.in:
+				if !ok {
+					close(o.done)
+					return
+				}
+				for s := range ch {
+					o.out <- s
+				}
 			}
 		}
-		close(o.out)
-		close(o.done)
 	}(o)
 
 	return o
 }
 
-func (o *Ochan) GetCh() chan<- string {
+func (o *Ochan) GetCh() chan string {
 	ch := make(chan string, 100)
-	o.In = append(o.In, ch)
+	o.in <- ch
+
 	return ch
 }
 
 func (o *Ochan) Wait() error {
+	close(o.in)
 	<-o.done
 	return nil
 }

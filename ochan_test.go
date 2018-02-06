@@ -48,6 +48,9 @@ func TestOchanBasic(t *testing.T) {
 		t.Errorf("NumGoroutine")
 	}
 
+	o.Wait()
+	close(result)
+
 	i := 0
 	for s := range result {
 		if g, e := s, expected[i]; g != e {
@@ -55,7 +58,6 @@ func TestOchanBasic(t *testing.T) {
 		}
 		i++
 	}
-	o.Wait()
 
 	n4 := runtime.NumGoroutine()
 	if n1 != n4 {
@@ -78,6 +80,9 @@ func ExampleOchan() {
 	close(c1)
 	close(c2)
 
+	o.Wait()
+	close(result)
+
 	for s := range result {
 		fmt.Println(s)
 		// Output:
@@ -86,5 +91,4 @@ func ExampleOchan() {
 		// Hello c2
 		// Bye c2
 	}
-	o.Wait()
 }
