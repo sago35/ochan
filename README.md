@@ -1,6 +1,6 @@
 # Ochan
 
-作成した順に出力するchan
+Package ochan provides ordered chan.
 
 ## Usage
 
@@ -20,6 +20,9 @@ func ExampleOchan() {
 	close(c1)
 	close(c2)
 
+	o.Wait()
+	close(result)
+
 	for s := range result {
 		fmt.Println(s)
 		// Output:
@@ -28,7 +31,6 @@ func ExampleOchan() {
 		// Hello c2
 		// Bye c2
 	}
-	o.Wait()
 }
 ```
 
