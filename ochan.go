@@ -6,14 +6,16 @@ type Ochan struct {
 	out  chan string
 	in   chan chan string
 	done chan struct{}
+	size int
 }
 
-// NewOchan returns a new Ochan struct.
-func NewOchan(out chan string) *Ochan {
+// NewOchan returns a new Ochan struct with specified buffer capacity.
+func NewOchan(out chan string, size int) *Ochan {
 	o := &Ochan{
 		out:  out,
-		in:   make(chan chan string, 100),
+		in:   make(chan chan string, size),
 		done: make(chan struct{}),
+		size: size,
 	}
 
 	go func(o *Ochan) {
@@ -37,10 +39,15 @@ func NewOchan(out chan string) *Ochan {
 // GetCh returns a next input channel. The input channel must be explicitly
 // closed after use.
 func (o *Ochan) GetCh() chan string {
-	ch := make(chan string, 100)
+	ch := make(chan string, o.size)
 	o.in <- ch
 
 	return ch
+}
+
+// SetSize sets the capacity of the channel returned by GetCh.
+func (o *Ochan) SetSize(size int) {
+	o.size = size
 }
 
 // Wait blocks until it retrieves data from all input channel. All input

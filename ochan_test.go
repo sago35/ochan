@@ -20,7 +20,7 @@ func TestOchanBasic(t *testing.T) {
 	}
 
 	result := make(chan string, 100)
-	o := NewOchan(result)
+	o := NewOchan(result, 100)
 	n2 := runtime.NumGoroutine()
 	if n1+1 != n2 {
 		t.Errorf("NumGoroutine %d %d", n1, n2)
@@ -67,7 +67,7 @@ func TestOchanBasic(t *testing.T) {
 
 func ExampleOchan() {
 	result := make(chan string, 100)
-	o := NewOchan(result)
+	o := NewOchan(result, 100)
 
 	c1 := o.GetCh()
 	c2 := o.GetCh()
