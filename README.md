@@ -9,7 +9,7 @@ Package ochan provides ordered chan.
 ```go
 func ExampleOchan() {
 	result := make(chan string, 100)
-	o := NewOchan(result)
+	o := NewOchan(result, 100)
 
 	c1 := o.GetCh()
 	c2 := o.GetCh()
