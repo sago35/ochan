@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"runtime"
 	"testing"
+	"time"
 )
 
 func TestOchanBasic(t *testing.T) {
@@ -17,6 +18,13 @@ func TestOchanBasic(t *testing.T) {
 		"c2-2",
 		"c3-1",
 		"c3-2",
+	}
+
+	expected2 := []string{
+		"c4-1",
+		"c4-2",
+		"c5-1",
+		"c5-2",
 	}
 
 	result := make(chan string, 100)
@@ -49,19 +57,49 @@ func TestOchanBasic(t *testing.T) {
 	}
 
 	o.Wait()
-	close(result)
 
-	i := 0
-	for s := range result {
+	for i := 0; i < len(expected); i++ {
+		s := <-result
 		if g, e := s, expected[i]; g != e {
-			t.Errorf("got %q, want %q", g, e)
+			t.Errorf("%d got %q, want %q", i, g, e)
 		}
-		i++
 	}
 
 	n4 := runtime.NumGoroutine()
-	if n1 != n4 {
-		t.Errorf("NumGoroutine %d %d", n1, n4)
+	if n1+1 != n4 {
+		t.Errorf("NumGoroutine %d %d", n1+1, n4)
+	}
+
+	c4 := o.GetCh()
+	c5 := o.GetCh()
+
+	c4 <- "c4-1"
+	c5 <- "c5-1"
+	c4 <- "c4-2"
+	c5 <- "c5-2"
+
+	close(c4)
+	close(c5)
+
+	o.Wait()
+	close(result)
+
+	for i := 0; i < len(expected2); i++ {
+		s := <-result
+		if g, e := s, expected2[i]; g != e {
+			t.Errorf("%d got %q, want %q", i, g, e)
+		}
+	}
+
+	o.Close()
+
+	n5 := runtime.NumGoroutine()
+	if n1 != n5 {
+		time.Sleep(10 * time.Millisecond)
+		n5 := runtime.NumGoroutine()
+		if n1 != n5 {
+			t.Errorf("NumGoroutine %d %d", n1, n5)
+		}
 	}
 }
 
