@@ -1,11 +1,16 @@
 // Package ochan provides ordered chan.
 package ochan
 
+import (
+	"sync"
+)
+
 // An Ochan is a structure for controlling the output order of channnels.
 type Ochan struct {
 	out  chan string
 	in   chan chan string
 	done chan struct{}
+	wg   sync.WaitGroup
 	size int
 }
 
@@ -14,7 +19,8 @@ func NewOchan(out chan string, size int) *Ochan {
 	o := &Ochan{
 		out:  out,
 		in:   make(chan chan string, size),
-		done: make(chan struct{}),
+		done: make(chan struct{}, 1),
+		wg:   sync.WaitGroup{},
 		size: size,
 	}
 
@@ -23,12 +29,14 @@ func NewOchan(out chan string, size int) *Ochan {
 			select {
 			case ch, ok := <-o.in:
 				if !ok {
-					close(o.done)
 					return
 				}
 				for s := range ch {
 					o.out <- s
 				}
+				o.wg.Done()
+			case <-o.done:
+				return
 			}
 		}
 	}(o)
@@ -41,6 +49,7 @@ func NewOchan(out chan string, size int) *Ochan {
 func (o *Ochan) GetCh() chan string {
 	ch := make(chan string, o.size)
 	o.in <- ch
+	o.wg.Add(1)
 
 	return ch
 }
@@ -53,7 +62,11 @@ func (o *Ochan) SetSize(size int) {
 // Wait blocks until it retrieves data from all input channel. All input
 // channels must be closed before calling this function.
 func (o *Ochan) Wait() error {
-	close(o.in)
-	<-o.done
+	o.wg.Wait()
 	return nil
+}
+
+// Close closed ochan's goroutine.
+func (o *Ochan) Close() {
+	close(o.done)
 }
