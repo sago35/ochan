@@ -14,14 +14,37 @@ type Ochan struct {
 	size int
 }
 
+// Option ...
+type Option func(*options)
+
+type options struct {
+	size int
+}
+
+var defaultOchanOption = options{
+	size: 100,
+}
+
+// WithSize ...
+func WithSize(s int) Option {
+	return func(o *options) {
+		o.size = s
+	}
+}
+
 // NewOchan returns a new Ochan struct with specified buffer capacity.
-func NewOchan(out chan string, size int) *Ochan {
+func NewOchan(out chan string, opt ...Option) *Ochan {
+	opts := defaultOchanOption
+	for _, f := range opt {
+		f(&opts)
+	}
+
 	o := &Ochan{
 		out:  out,
-		in:   make(chan chan string, size),
+		in:   make(chan chan string, opts.size),
 		done: make(chan struct{}, 1),
 		wg:   sync.WaitGroup{},
-		size: size,
+		size: opts.size,
 	}
 
 	go func(o *Ochan) {
