@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// An Ochan is a structure for controlling the output order of channnels.
+// An Ochan is a structure for controlling the output order of channels.
 type Ochan struct {
 	out  chan string
 	in   chan chan string
