@@ -130,3 +130,35 @@ func ExampleOchan() {
 		// Bye c2
 	}
 }
+
+func ExampleOchanWithStruct() {
+	type X struct {
+		No      int
+		Message string
+	}
+	result := make(chan X, 100)
+	o := NewOchan(result, 100)
+
+	c1 := o.GetCh()
+	c2 := o.GetCh()
+
+	c1 <- X{No: 1, Message: "Hello c1"}
+	c2 <- X{No: 2, Message: "Hello c2"}
+	c1 <- X{No: 3, Message: "Bye c1"}
+	c2 <- X{No: 4, Message: "Bye c2"}
+
+	close(c1)
+	close(c2)
+
+	o.Wait()
+	close(result)
+
+	for s := range result {
+		fmt.Println(s.No, s.Message)
+		// Output:
+		// 1 Hello c1
+		// 3 Bye c1
+		// 2 Hello c2
+		// 4 Bye c2
+	}
+}

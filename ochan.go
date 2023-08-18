@@ -6,25 +6,25 @@ import (
 )
 
 // An Ochan is a structure for controlling the output order of channels.
-type Ochan struct {
-	out  chan string
-	in   chan chan string
+type Ochan[T any] struct {
+	out  chan T
+	in   chan chan T
 	done chan struct{}
 	wg   sync.WaitGroup
 	size int
 }
 
 // NewOchan returns a new Ochan struct with specified buffer capacity.
-func NewOchan(out chan string, size int) *Ochan {
-	o := &Ochan{
+func NewOchan[T any](out chan T, size int) *Ochan[T] {
+	o := &Ochan[T]{
 		out:  out,
-		in:   make(chan chan string, size),
+		in:   make(chan chan T, size),
 		done: make(chan struct{}, 1),
 		wg:   sync.WaitGroup{},
 		size: size,
 	}
 
-	go func(o *Ochan) {
+	go func(o *Ochan[T]) {
 		for {
 			select {
 			case ch, ok := <-o.in:
@@ -46,8 +46,8 @@ func NewOchan(out chan string, size int) *Ochan {
 
 // GetCh returns a next input channel. The input channel must be explicitly
 // closed after use.
-func (o *Ochan) GetCh() chan string {
-	ch := make(chan string, o.size)
+func (o *Ochan[T]) GetCh() chan T {
+	ch := make(chan T, o.size)
 	o.in <- ch
 	o.wg.Add(1)
 
@@ -55,18 +55,18 @@ func (o *Ochan) GetCh() chan string {
 }
 
 // SetSize sets the capacity of the channel returned by GetCh.
-func (o *Ochan) SetSize(size int) {
+func (o *Ochan[T]) SetSize(size int) {
 	o.size = size
 }
 
 // Wait blocks until it retrieves data from all input channel. All input
 // channels must be closed before calling this function.
-func (o *Ochan) Wait() error {
+func (o *Ochan[T]) Wait() error {
 	o.wg.Wait()
 	return nil
 }
 
 // Close closed ochan's goroutine.
-func (o *Ochan) Close() {
+func (o *Ochan[T]) Close() {
 	close(o.done)
 }

@@ -6,6 +6,10 @@ Package ochan provides ordered chan.
 
 ## Usage
 
+Package ochan supports generics.  
+Thus, it can work with any type by supplying chan T to `NewOchan()`.  
+See ochan_test.go for an example of its use.  
+
 ```go
 func ExampleOchan() {
 	result := make(chan string, 100)
