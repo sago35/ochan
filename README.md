@@ -1,4 +1,4 @@
-[![GoDoc Reference](https://godoc.org/github.com/sago35/ochan?status.svg)](https://godoc.org/github.com/sago35/ochan)
+[![Actions Status](https://github.com/sago35/ochan/actions/workflows/build.yml/badge.svg)](https://github.com/sago35/Getopt-Kingpin/actions) [![GoDoc Reference](https://godoc.org/github.com/sago35/ochan?status.svg)](https://godoc.org/github.com/sago35/ochan) [![Go Report Card](https://goreportcard.com/badge/github.com/sago35/ochan)](https://goreportcard.com/report/github.com/sago35/ochan)
 
 # Ochan
 
